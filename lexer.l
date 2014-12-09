@@ -5,6 +5,7 @@ using namespace std;
 
 #define YY_DECL extern "C" int yylex()
 
+int line_num;
 %}
 %%
 
@@ -57,7 +58,7 @@ while                                   { return TokenWhile; }
 \,                                      { return TokenComma; }
 end                                     { return TokenEnd; }
 \;                                      { return TokenSep; }
-\n                                      { return TokenEndl; }
+\n                                      { line_num ++; return TokenEndl; }
 
    /* Types and Vars */
 
