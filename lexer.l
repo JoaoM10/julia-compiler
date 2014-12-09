@@ -62,11 +62,11 @@ end                                     { return TokenEnd; }
 
    /* Types and Vars */
 
-[0-9]+                                  { return TokenInt; }
-[0-9]+\.[0-9]+                          { return TokenFloat; }
-true                                    { return TokenBoolT; }
-false                                   { return TokenBoolF; }
-[a-zA-Z\_][a-zA-Z0-9\_\!]*              { return TokenVar; }
+[0-9]+\.[0-9]+                          { yylval.fval = atof(yytext); return TokenFloat; }
+[0-9]+                                  { yylval.ival = atoi(yytext); return TokenInt; }
+true                                    { yylval.bval = (yytext[0] == 't'); return TokenBool; }
+false                                   { yylval.bval = (yytext[0] == 't'); return TokenBool; }
+[a-zA-Z\_][a-zA-Z0-9\_\!]*              { yylval.sval = strdup(yytext); return TokenVar; }
 
    /* Ignore everything else */
 

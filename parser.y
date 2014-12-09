@@ -13,16 +13,23 @@ void yyerror(const char *s);
 %union {
   int ival;
   double fval;
-  char *sval;
   bool bval;
+  char *sval;
 }
 
+%token <ival> TokenInt
+%token <fval> TokenFloat
+%token <bval> TokenBool
+%token <sval> TokenVar
 
-
-%token <ival> INT
-%token <fval> FLOAT
-%token <sval> STRING
-%token <sval> BOOL
+%token TokenAdd TokenSub TokenMul TokenDiv TokenPow TokenMod TokenLB TokenRB
+%token TokenEq TokenNotEq TokenLeq TokenGeq TokenLt TokenGt
+%token TokenBoolNot TokenBoolOr TokenBoolAnd
+%token TokenPrintln
+%token TokenAtr
+%token TokenIf TokenElseIf TokenElse
+%token TokenWhile
+%token TokenComma TokenEnd TokenSep TokenEndl
 
 %%
 prog:
@@ -39,7 +46,7 @@ int main(int argc, char **argv){
   FILE *fin = fopen(argv[1], "r");
   if(!fin){
     printf("File not found!\n");
-    printxf("Usage: %s <file name>\n", argv[0]);
+    printf("Usage: %s <file name>\n", argv[0]);
     return -1;
   }
   yyin = fin;
