@@ -80,6 +80,7 @@ NumExp:
 | TokenLB NumExp TokenRB                                        { /**/ }
 | TokenInt                                                      { /**/ }
 | TokenFloat                                                    { /**/ }
+| TokenBool                                                     { /**/ }
 | TokenVar                                                      { /**/ }
 ;
 
@@ -94,6 +95,7 @@ BoolExp:
 | BoolExp TokenLeq BoolExp                                      { /**/ }
 | BoolExp TokenGeq BoolExp                                      { /**/ }
 | TokenLB NumExp TokenRB                                        { /**/ }
+| TokenInt                                                      { /**/ }
 | TokenBool                                                     { /**/ }
 | TokenVar                                                      { /**/ }
 ;
