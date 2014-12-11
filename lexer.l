@@ -5,7 +5,7 @@ using namespace std;
 
 #define YY_DECL extern "C" int yylex()
 
-int line_num;
+int line_num = 1;
 %}
 %%
 

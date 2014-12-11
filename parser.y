@@ -42,11 +42,11 @@ void yyerror(const char *s);
 %%
 
 Cmd:
-  TokenIf BoolExp TokenEndl Cmd IfExp TokenEnd                  { /**/ }
-| TokenIf BoolExp TokenEndl Cmd IfExp TokenElse Cmd TokenEnd    { /**/ }
-| TokenWhile BoolExp TokenEndl Cmd TokenEnd                     { /**/ }
-| TokenVar TokenAtr Exp                                         { /**/ }
-| TokenPrintln TokenLB ListExp TokenRB                          { /**/ }
+  TokenIf BoolExp TokenEndl Cmd IfExp TokenEnd                  { printf("If\n"); }
+| TokenIf BoolExp TokenEndl Cmd IfExp TokenElse Cmd TokenEnd    { printf("IfElse\n"); }
+| TokenWhile BoolExp TokenEndl Cmd TokenEnd                     { printf("While\n"); }
+| TokenVar TokenAtr Exp                                         { printf("Atribution\n"); }
+| TokenPrintln TokenLB ListExp TokenRB                          { printf("Println\n"); }
 | Cmd TokenEndl Cmd                                             { /**/ }
 | Cmd TokenEndl                                                 { /**/ }
 | TokenEndl Cmd                                                 { /**/ }
@@ -80,22 +80,22 @@ NumExp:
 | TokenLB NumExp TokenRB                                        { /**/ }
 | TokenInt                                                      { /**/ }
 | TokenFloat                                                    { /**/ }
-| TokenBool                                                     { /**/ }
 | TokenVar                                                      { /**/ }
 ;
 
 BoolExp:
   BoolExp TokenBoolAnd BoolExp                                  { /**/ }
 | BoolExp TokenBoolOr BoolExp                                   { /**/ }
-| TokenBoolNot BoolExp                                          { /**/ }
+| NumExp TokenEq NumExp                                         { /**/ }
+| NumExp TokenNotEq NumExp                                      { /**/ }
 | BoolExp TokenEq BoolExp                                       { /**/ }
 | BoolExp TokenNotEq BoolExp                                    { /**/ }
-| BoolExp TokenLt BoolExp                                       { /**/ }
-| BoolExp TokenGt BoolExp                                       { /**/ }
-| BoolExp TokenLeq BoolExp                                      { /**/ }
-| BoolExp TokenGeq BoolExp                                      { /**/ }
-| TokenLB NumExp TokenRB                                        { /**/ }
-| TokenInt                                                      { /**/ }
+| NumExp TokenLt NumExp                                         { /**/ }
+| NumExp TokenGt NumExp                                         { /**/ }
+| NumExp TokenLeq NumExp                                        { /**/ }
+| NumExp TokenGeq NumExp                                        { /**/ }
+| TokenBoolNot BoolExp                                          { /**/ }
+| TokenLB BoolExp TokenRB                                       { /**/ }
 | TokenBool                                                     { /**/ }
 | TokenVar                                                      { /**/ }
 ;
