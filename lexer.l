@@ -1,7 +1,7 @@
 %{
 #include <bits/stdc++.h>
 #include "ast.h"
-#include "parser.tab.h"
+#include "y.tab.h"
 using namespace std;
 
 #define YY_DECL extern "C" int yylex()
