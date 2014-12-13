@@ -1,5 +1,6 @@
 %{
 #include <bits/stdc++.h>
+#include "ast.h"
 #include "parser.tab.h"
 using namespace std;
 
@@ -70,6 +71,7 @@ false                                   { yylval.bval = (yytext[0] == 't'); retu
 
    /* Ignore everything else */
 
-.                                       ;
+[ \t\f\r]                               ;
+.                                       { /* ERROR! */ }
 
 %%

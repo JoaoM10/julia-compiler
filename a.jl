@@ -9,6 +9,20 @@ while c > 0
   c = c - 1
 end
 
-println(a,c)
+if a < b
+  c = 73
+end
 
+if a < b
+  a = b
+  b = c
+elseif b < c
+  b = c
+else
+  c = a + c * b
+end
+
+xpto = -73
+
+println(a,c)
 println(a)
