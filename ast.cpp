@@ -2,10 +2,13 @@
 #include "ast.h"
 using namespace std;
 
+
 map <string, VAL_TYPE> var_types;
 
 
-
+VAL_TYPE Value::get_type(){
+  return tp;
+}
 VAL_TYPE Value::get_value_type(){
   if(tp == VT_VAR)
     return var_types[get_var()];
@@ -103,8 +106,12 @@ VAL_TYPE Exp_Not::get_type(){
   return VT_BOOL;
 }
 
-
+extern int line_num;
 bool Exp_Val::semantic_analysis(){
+  if(v1->get_type() == VT_VAR && var_types.find(v1->get_var()) == var_types.end()){
+    fprintf(stderr, "ERROR, Variable \"%s\" used without initialization on line %d!\n", v1->get_var().c_str(), line_num);
+    return false;
+  }
   return true;
 }
 bool Exp_Add::semantic_analysis(){
@@ -169,9 +176,17 @@ bool Cmd_Print::semantic_analysis(){
   return true;
 }
 bool Cmd_While::semantic_analysis(){
-  return (x1->get_type() == VT_BOOL);
+  if(x1->get_type() != VT_BOOL){
+    fprintf(stderr, "ERROR, while condition should be a boolean expression on line %d!\n", line_num);
+    return false;
+  }
+  return true;
 }
 bool Cmd_If::semantic_analysis(){
-  return (x1->get_type() == VT_BOOL);
+  if(x1->get_type() != VT_BOOL){
+    fprintf(stderr, "ERROR, if condition should be a boolean expression on line %d!\n", line_num);
+    return false;
+  }
+  return true;
 }
 

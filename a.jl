@@ -1,6 +1,8 @@
 a = 0
-b = 1
+b = 1.4
 c = 10
+
+x = z
 
 while c > 0
   tmp = b
