@@ -3,8 +3,8 @@
 #include "icg.h"
 using namespace std;
 
-
 map <string, VAL_TYPE> var_types;
+
 
 
 VAL_TYPE Value::get_type(){
@@ -130,61 +130,71 @@ VAL_TYPE Exp_Not::get_type(){
   return VT_BOOL;
 }
 
-extern int line_num;
+
+
 bool Exp_Val::semantic_analysis(){
   if(v1->get_type() == VT_VAR && var_types.find(v1->str()) == var_types.end()){
-    fprintf(stderr, "ERROR, Variable \"%s\" used without initialization on line %d!\n", v1->str().c_str(), line_num);
+    fprintf(stderr, "ERROR, Variable \"%s\" used without initialization!\n", v1->str().c_str());
     return false;
   }
   return true;
 }
 bool Exp_Add::semantic_analysis(){
-  return true;
+  return (x1->semantic_analysis() && x2->semantic_analysis());
 }
 bool Exp_Sub::semantic_analysis(){
-  return true;
+  return (x1->semantic_analysis() && x2->semantic_analysis());
 }
 bool Exp_Mul::semantic_analysis(){
-  return true;
+  return (x1->semantic_analysis() && x2->semantic_analysis());
 }
 bool Exp_Div::semantic_analysis(){
-  return true;
+  return (x1->semantic_analysis() && x2->semantic_analysis());
 }
 bool Exp_Pow::semantic_analysis(){
-  return true;
+  return (x1->semantic_analysis() && x2->semantic_analysis());
 }
 bool Exp_Mod::semantic_analysis(){
-  return true;
+  return (x1->semantic_analysis() && x2->semantic_analysis());
 }
 bool Exp_Min::semantic_analysis(){
-  return true;
+  return x1->semantic_analysis();
 }
 bool Exp_And::semantic_analysis(){
-  return true;
+  return (x1->semantic_analysis() && x2->semantic_analysis());
 }
 bool Exp_Or::semantic_analysis(){
-  return true;
+  return (x1->semantic_analysis() && x2->semantic_analysis());
 }
 bool Exp_Eq::semantic_analysis(){
-  return true;
+  return (x1->semantic_analysis() && x2->semantic_analysis());
 }
 bool Exp_Neq::semantic_analysis(){
-  return true;
+  return (x1->semantic_analysis() && x2->semantic_analysis());
 }
 bool Exp_Lt::semantic_analysis(){
-  return true;
+  return (x1->semantic_analysis() && x2->semantic_analysis());
 }
 bool Exp_Gt::semantic_analysis(){
-  return true;
+  return (x1->semantic_analysis() && x2->semantic_analysis());
 }
 bool Exp_Leq::semantic_analysis(){
-  return true;
+  return (x1->semantic_analysis() && x2->semantic_analysis());
 }
 bool Exp_Geq::semantic_analysis(){
-  return true;
+  return (x1->semantic_analysis() && x2->semantic_analysis());
 }
 bool Exp_Not::semantic_analysis(){
-  return true;
+  return x1->semantic_analysis();
+}
+
+
+
+
+bool Lst::semantic_analysis(){
+  if(next == NULL)
+    return xp->semantic_analysis();
+  return (xp->semantic_analysis() && next->semantic_analysis());
 }
 
 
@@ -192,50 +202,99 @@ bool Exp_Not::semantic_analysis(){
 bool Cmd_Atr::semantic_analysis(){
   if(var_types.find(v1->str()) == var_types.end()){
     var_types[v1->str()] = x1->get_type();
-    return true;
+    return x1->semantic_analysis();
   }
+  if(!x1->semantic_analysis())
+    return false;
   if(var_types[v1->str()] != x1->get_type()){
-    fprintf(stderr, "ERROR, variable %s, used on line %d, has already been initialized with another value type!\n", v1->str().c_str(), line_num);
+    fprintf(stderr, "ERROR, variable %s has already been initialized with another value type!\n", v1->str().c_str());
     return false;
   }
   return true;
 }
 bool Cmd_Seq::semantic_analysis(){
-  return true;
+  bool ck = true;
+  ck = ck && c1->semantic_analysis();
+  ck = ck && c2->semantic_analysis();
+  return ck;
 }
 bool Cmd_Print::semantic_analysis(){
-  return true;
+  return lst->semantic_analysis();
 }
 bool Cmd_While::semantic_analysis(){
-  if(x1->get_type() != VT_BOOL){
-    fprintf(stderr, "ERROR, while condition should be a boolean expression on line %d!\n", line_num);
-    return false;
+  bool ck = true;
+  map <string, VAL_TYPE> mp_buf;
+  if(!x1->semantic_analysis())
+    ck = false;
+  else if(x1->get_type() != VT_BOOL){
+    fprintf(stderr, "ERROR, while condition should be a boolean expression!\n");
+    ck = false;
   }
-  return true;
+  mp_buf = var_types;
+  ck = ck && c1->semantic_analysis();
+  var_types = mp_buf;
+  return ck;
 }
 bool Cmd_If::semantic_analysis(){
-  if(x1->get_type() != VT_BOOL){
-    fprintf(stderr, "ERROR, if condition should be a boolean expression on line %d!\n", line_num);
-    return false;
+  bool ck = true;
+  map <string, VAL_TYPE> mp_buf;
+  if(!x1->semantic_analysis())
+    ck = false;
+  else if(x1->get_type() != VT_BOOL){
+    fprintf(stderr, "ERROR, if condition should be a boolean expression!\n");
+    ck = false;
   }
-  return true;
+  mp_buf = var_types;
+  ck = ck && c1->semantic_analysis();
+  var_types = mp_buf;
+  ElseIf *cur = el;
+  while(cur != NULL){
+    ck = ck && cur->semantic_analysis();
+    mp_buf = var_types;
+    ck = ck && cur->c->semantic_analysis();
+    var_types = mp_buf;
+    cur = cur->next;
+  }
+  return ck;
 }
 bool Cmd_IfElse::semantic_analysis(){
-  if(x1->get_type() != VT_BOOL){
-    fprintf(stderr, "ERROR, if condition should be a boolean expression on line %d!\n", line_num);
-    return false;
+  bool ck = true;
+  map <string, VAL_TYPE> mp_buf;
+  if(!x1->semantic_analysis())
+    ck = false;
+  else if(x1->get_type() != VT_BOOL){
+    fprintf(stderr, "ERROR, if condition should be a boolean expression!\n");
+    ck = false;
   }
-  return true;
+  mp_buf = var_types;
+  ck = ck && c1->semantic_analysis();
+  var_types = mp_buf;
+  ElseIf *cur = el;
+  while(cur != NULL){
+    ck = ck && cur->semantic_analysis();
+    mp_buf = var_types;
+    ck = ck && cur->c->semantic_analysis();
+    var_types = mp_buf;
+    cur = cur->next;
+  }
+  mp_buf = var_types;
+  ck = ck && c2->semantic_analysis();
+  var_types = mp_buf;
+  return ck;
 }
-
-
-
 bool ElseIf::semantic_analysis(){
+  if(!xp->semantic_analysis())
+    return false;
   if(xp->get_type() != VT_BOOL){
-    fprintf(stderr, "ERROR, if condition should be a boolean expression on line %d!\n", line_num);
+    fprintf(stderr, "ERROR, elseif condition should be a boolean expression!\n");
     return false;
   }
   return true;
 }
 
 
+
+bool Prgm::semantic_analysis(){
+  var_types.clear();
+  return c->semantic_analysis();
+}

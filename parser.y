@@ -10,7 +10,6 @@ extern "C" FILE *yyin;
 extern int line_num;
 
 Prgm *root;
-bool sem_ok = true;
 
 void yyerror(const char *s);
 %}
@@ -167,9 +166,11 @@ int main(int argc, char **argv){
 	
   yyparse();
 
-  if(!sem_ok)
+  if(!root->semantic_analysis())
       exit(-1);
 
+  printf("Semantic Analysis: OK!\n");
+  
   ast_to_tac(root);
   
   return 0;
