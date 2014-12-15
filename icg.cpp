@@ -272,21 +272,61 @@ void Cmd_While::gen_code(string lbl_nxt){
   printf("\tgoto %s\n", top.str().c_str());
 }
 void Cmd_If::gen_code(string lbl_nxt){
-  // missing elseif expressions...
-  Label body;
-  x1->gen_jmp_code(body.str(), lbl_nxt);
-  printf("%s:\n", body.str().c_str());
-  c1->gen_code(lbl_nxt);
+  if(el == NULL){
+    Label body;
+    x1->gen_jmp_code(body.str(), lbl_nxt);
+    printf("%s:\n", body.str().c_str());
+    c1->gen_code(lbl_nxt);
+  }
+  else{
+    Label then_lbl, else_lbl;
+    x1->gen_jmp_code(then_lbl.str(), else_lbl.str());
+    printf("%s:\n", then_lbl.str().c_str());
+    c1->gen_code(lbl_nxt);
+    printf("\tgoto %s\n", lbl_nxt.c_str());
+    printf("%s:\n", else_lbl.str().c_str());
+    ElseIf *cur = el;
+    while(cur != NULL){
+      Label t1, e1;
+      cur->xp->gen_jmp_code(t1.str(), e1.str());
+      printf("%s:\n", t1.str().c_str());
+      cur->c->gen_code(lbl_nxt);
+      printf("\tgoto %s\n", lbl_nxt.c_str());
+      if(cur->next != NULL)
+        printf("%s:\n", e1.str().c_str());
+      cur = cur->next;
+    }
+  }
 }
 void Cmd_IfElse::gen_code(string lbl_nxt){
-  // missing elseif expressions...
-  Label then_lbl, else_lbl;
-  x1->gen_jmp_code(then_lbl.str(), else_lbl.str());
-  printf("%s:\n", then_lbl.str().c_str());
-  c1->gen_code(lbl_nxt);
-  printf("\tgoto %s\n", lbl_nxt.c_str());
-  printf("%s:\n", else_lbl.str().c_str());
-  c2->gen_code(lbl_nxt);
+  if(el == NULL){
+    Label then_lbl, else_lbl;
+    x1->gen_jmp_code(then_lbl.str(), else_lbl.str());
+    printf("%s:\n", then_lbl.str().c_str());
+    c1->gen_code(lbl_nxt);
+    printf("\tgoto %s\n", lbl_nxt.c_str());
+    printf("%s:\n", else_lbl.str().c_str());
+    c2->gen_code(lbl_nxt);
+  }
+  else{
+    Label then_lbl, else_lbl;
+    x1->gen_jmp_code(then_lbl.str(), else_lbl.str());
+    printf("%s:\n", then_lbl.str().c_str());
+    c1->gen_code(lbl_nxt);
+    printf("\tgoto %s\n", lbl_nxt.c_str());
+    printf("%s:\n", else_lbl.str().c_str());
+    ElseIf *cur = el;
+    while(cur != NULL){
+      Label t1, e1;
+      cur->xp->gen_jmp_code(t1.str(), e1.str());
+      printf("%s:\n", t1.str().c_str());
+      cur->c->gen_code(lbl_nxt);
+      printf("\tgoto %s\n", lbl_nxt.c_str());
+      printf("%s:\n", e1.str().c_str());
+      cur = cur->next;
+    }
+    c2->gen_code(lbl_nxt);
+  }
 }
 
 
