@@ -1,5 +1,5 @@
 CCC = g++
-CCFLAGS= -O2
+CCFLAGS= -O2 -std=c++0x
 LEX = flex
 LFLAGS= -8     
 YACC= bison 
@@ -7,11 +7,14 @@ YFLAGS= -d -t -y
 
 RM = /bin/rm -f
 
-compiler: y.tab.o lex.yy.o ast.o
-	${CCC} ${CCFLAGS} lex.yy.o y.tab.o ast.o -o compiler -lfl
+compiler: y.tab.o lex.yy.o ast.o icg.o
+	${CCC} ${CCFLAGS} lex.yy.o y.tab.o ast.o icg.o -o compiler -lfl
+
+icg.o: icg.cpp icg.h
+	${CCC} ${CCFLAGS} -c icg.cpp
 
 ast.o: ast.cpp ast.h
-	${CCC} -c ast.cpp
+	${CCC} ${CCFLAGS} -c ast.cpp
 
 y.tab.o: parser.y
 	${YACC} ${YFLAGS} parser.y

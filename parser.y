@@ -1,6 +1,7 @@
 %{
 #include <bits/stdc++.h>
 #include "ast.h"
+#include "icg.h"
 using namespace std;
 
 extern "C" int yylex();
@@ -67,7 +68,8 @@ Prgm:
 Cmd:
                 TokenIf BoolExp TokenEndl Cmd TokenEnd                        { $$ = new Cmd_If($2, $4); }
         |       TokenIf BoolExp TokenEndl Cmd IfExp TokenEnd                  { $$ = new Cmd_If($2, $4, $5); }                
-        |       TokenIf BoolExp TokenEndl Cmd IfExp TokenElse Cmd TokenEnd    { $$ = new Cmd_If($2, $4, $5, $7); }
+        |       TokenIf BoolExp TokenEndl Cmd TokenElse Cmd TokenEnd          { $$ = new Cmd_IfElse($2, $4, $6); }
+        |       TokenIf BoolExp TokenEndl Cmd IfExp TokenElse Cmd TokenEnd    { $$ = new Cmd_IfElse($2, $4, $5, $7); }
         |       TokenWhile BoolExp TokenEndl Cmd TokenEnd                     { $$ = new Cmd_While($2, $4); }
         |       TokenVar TokenAtr Exp                                         { $$ = new Cmd_Atr(new Var($1), $3); }
         |       TokenPrintln TokenLB ListExp TokenRB                          { $$ = new Cmd_Print($3); }
@@ -100,17 +102,15 @@ Exp:
         |       BoolExp TokenBoolOr BoolExp                                   { $$ = new Exp_Or($1, $3); }
         |       NumExp TokenEq NumExp                                         { $$ = new Exp_Eq($1, $3); }
         |       NumExp TokenNotEq NumExp                                      { $$ = new Exp_Neq($1, $3); }
-//      |       BoolExp TokenEq BoolExp                                       { $$ = new Exp_Eq($1, $3); }
-//      |       BoolExp TokenNotEq BoolExp                                    { $$ = new Exp_Neq($1, $3); }
+        |       BoolExp TokenEq BoolExp                                       { $$ = new Exp_Eq($1, $3); }
+        |       BoolExp TokenNotEq BoolExp                                    { $$ = new Exp_Neq($1, $3); }
         |       NumExp TokenLt NumExp                                         { $$ = new Exp_Lt($1, $3); }
         |       NumExp TokenGt NumExp                                         { $$ = new Exp_Gt($1, $3); }
         |       NumExp TokenLeq NumExp                                        { $$ = new Exp_Leq($1, $3); }
         |       NumExp TokenGeq NumExp                                        { $$ = new Exp_Geq($1, $3); }
         |       TokenBoolNot BoolExp                                          { $$ = new Exp_Not($2); }
-//      |       TokenLB BoolExp TokenRB                                       { $$ = $2; }
-        |       TokenSub TokenInt                                             { $$ = new Exp_Min(new Int($2)); }
-        |       TokenSub TokenFloat                                           { $$ = new Exp_Min(new Float($2)); }
-        |       TokenSub TokenVar                                             { $$ = new Exp_Min(new Var($2)); }
+        |       TokenLB BoolExp TokenRB                                       { $$ = $2; }
+        |       TokenSub NumExp                                               { $$ = new Exp_Min($2); }
         |       TokenInt                                                      { $$ = new Exp_Val(new Int($1)); }
         |       TokenFloat                                                    { $$ = new Exp_Val(new Float($1)); }
         |       TokenBool                                                     { $$ = new Exp_Val(new Bool($1)); }
@@ -125,9 +125,7 @@ NumExp:
         |       NumExp TokenPow NumExp                                        { $$ = new Exp_Pow($1, $3); }
         |       NumExp TokenMod NumExp                                        { $$ = new Exp_Mod($1, $3); }
         |       TokenLB NumExp TokenRB                                        { $$ = $2; }
-        |       TokenSub TokenInt                                             { $$ = new Exp_Min(new Int($2)); }
-        |       TokenSub TokenFloat                                           { $$ = new Exp_Min(new Float($2)); }
-        |       TokenSub TokenVar                                             { $$ = new Exp_Min(new Var($2)); }
+        |       TokenSub NumExp                                               { $$ = new Exp_Min($2); }
         |       TokenInt                                                      { $$ = new Exp_Val(new Int($1)); }
         |       TokenFloat                                                    { $$ = new Exp_Val(new Float($1)); }
         |       TokenVar                                                      { $$ = new Exp_Val(new Var($1)); }
@@ -138,14 +136,14 @@ BoolExp:
         |       BoolExp TokenBoolOr BoolExp                                   { $$ = new Exp_Or($1, $3); }
         |       NumExp TokenEq NumExp                                         { $$ = new Exp_Eq($1, $3); }
         |       NumExp TokenNotEq NumExp                                      { $$ = new Exp_Neq($1, $3); }
-//      |       BoolExp TokenEq BoolExp                                       { $$ = new Exp_Eq($1, $3); }
-//      |       BoolExp TokenNotEq BoolExp                                    { $$ = new Exp_Neq($1, $3); }
+        |       BoolExp TokenEq BoolExp                                       { $$ = new Exp_Eq($1, $3); }
+        |       BoolExp TokenNotEq BoolExp                                    { $$ = new Exp_Neq($1, $3); }
         |       NumExp TokenLt NumExp                                         { $$ = new Exp_Lt($1, $3); }
         |       NumExp TokenGt NumExp                                         { $$ = new Exp_Gt($1, $3); }
         |       NumExp TokenLeq NumExp                                        { $$ = new Exp_Leq($1, $3); }
         |       NumExp TokenGeq NumExp                                        { $$ = new Exp_Geq($1, $3); }
         |       TokenBoolNot BoolExp                                          { $$ = new Exp_Not($2); }
-//      |       TokenLB BoolExp TokenRB                                       { $$ = $2; }
+        |       TokenLB BoolExp TokenRB                                       { $$ = $2; }
         |       TokenBool                                                     { $$ = new Exp_Val(new Bool($1)); }
         |       TokenVar                                                      { $$ = new Exp_Val(new Var($1)); }
                 ;
@@ -172,7 +170,7 @@ int main(int argc, char **argv){
   if(!sem_ok)
       exit(-1);
 
-  printf("Semantic Analysis: OK!\n");
+  ast_to_tac(root);
   
   return 0;
 }
