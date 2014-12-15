@@ -34,6 +34,7 @@ class Var : public Value {
 public:
   string sval;
   Var (char *x) : sval(x) { tp = VT_VAR; }
+  Var (string x) : sval(x) { tp = VT_VAR; }
   string str();
 };
 
