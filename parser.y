@@ -168,10 +168,8 @@ int main(int argc, char **argv){
 
   if(!root->semantic_analysis())
       exit(-1);
-
-  printf("Semantic Analysis: OK!\n");
   
-  ast_to_tac(root);
+  compile(root);
   
   return 0;
 }
