@@ -190,7 +190,14 @@ bool Exp_Not::semantic_analysis(){
 
 
 bool Cmd_Atr::semantic_analysis(){
-  var_types[v1->str()] = x1->get_type();
+  if(var_types.find(v1->str()) == var_types.end()){
+    var_types[v1->str()] = x1->get_type();
+    return true;
+  }
+  if(var_types[v1->str()] != x1->get_type()){
+    fprintf(stderr, "ERROR, variable %s, used on line %d, has already been initialized with another value type!\n", v1->str().c_str(), line_num);
+    return false;
+  }
   return true;
 }
 bool Cmd_Seq::semantic_analysis(){
