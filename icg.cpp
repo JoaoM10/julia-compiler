@@ -405,7 +405,10 @@ void Tac::gen_mips(){
     
   case TC_PRINT:
     break;
-  case TC_PRINT_ENDL: 
+  case TC_PRINT_ENDL:
+    fprintf(fout, "\taddi\t$v0, $zero, 4\n");
+    fprintf(fout, "\tla\t$a0, space\n");
+    fprintf(fout, "\tsyscall\n");
     break;
 
   case TC_ADD:
@@ -473,6 +476,9 @@ void Tac::gen_mips(){
 
 
 void tac_to_mips(){  
+  fprintf(fout, ".data\n");
+  fprintf(fout, "space:\t.asciiz \"\\n\"\n");  
+  fprintf(fout, ".text\n");
   for(int i = 0; i < (int)tac_code.size(); i ++)
     tac_code[i]->gen_mips();
 }
