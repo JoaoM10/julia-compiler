@@ -25,4 +25,4 @@ lex.yy.o: lexer.l
 	${CCC} ${CCFLAGS} lex.yy.c -c 
 
 clean:
-	/bin/rm -f lex.yy.* y.tab.* *.o compiler
+	/bin/rm -f lex.yy.* y.tab.* *.o *.asm compiler

@@ -7,6 +7,7 @@ using namespace std;
 unsigned int Label::cnt = 0;
 unsigned int TempAddr::cnt = 0;
 vector <Tac*> tac_code;
+FILE *fout;
 
 Addr* Exp_Val::gen_code(){
   return (new ValAddr(v1));
@@ -444,20 +445,28 @@ void Tac::gen_mips(){
   case TC_ATR:
     break;
   case TC_LBL:
+    fprintf(fout, "%s:\n", r1->str().c_str());
     break;
   case TC_GOTO:
+    fprintf(fout, "j\t%s\n", r1->str().c_str());
     break;
   case TC_IFEQ:
+    fprintf(fout, "\tbeq\t%s, %s, %s\n", r1->str().c_str(), r2->str().c_str(), r3->str().c_str());
     break;
   case TC_IFNEQ:
+    fprintf(fout, "\tbne\t%s, %s, %s\n", r1->str().c_str(), r2->str().c_str(), r3->str().c_str());
     break;
   case TC_IFLT:
+    fprintf(fout, "\tblt\t%s, %s, %s\n", r1->str().c_str(), r2->str().c_str(), r3->str().c_str());
     break;
   case TC_IFGT:
+    fprintf(fout, "\tbgt\t%s, %s, %s\n", r1->str().c_str(), r2->str().c_str(), r3->str().c_str());
     break;
   case TC_IFLEQ:
+    fprintf(fout, "\tble\t%s, %s, %s\n", r1->str().c_str(), r2->str().c_str(), r3->str().c_str());
     break;
   case TC_IFGEQ:
+    fprintf(fout, "\tbge\t%s, %s, %s\n", r1->str().c_str(), r2->str().c_str(), r3->str().c_str());
     break;
   }
 }
@@ -471,5 +480,7 @@ void tac_to_mips(){
 
 void compile(Prgm *r){
   ast_to_tac(r);
+  fout = fopen("a.asm", "w");
   tac_to_mips();
+  fclose(fout);
 }
