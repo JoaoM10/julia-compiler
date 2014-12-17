@@ -67,4 +67,4 @@ public:
 
 
 
-void compile(Prgm*);
+void compile(Prgm*, bool, char*);

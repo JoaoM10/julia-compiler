@@ -1,14 +1,14 @@
 #include <bits/stdc++.h>
 #include "ast.h"
 #include "icg.h"
-#define PRINT_TAC 0
 #define X first
 #define Y second
 using namespace std;
 
 typedef pair <int, VAL_TYPE> piv;
 
-              
+bool PRINT_TAC;
+
 unsigned int Label::cnt = 0;
 unsigned int TempAddr::cnt = 0;
 vector <Tac*> tac_code;
@@ -739,10 +739,11 @@ void tac_to_mips(){
 }
 
 
-void compile(Prgm *r){
+void compile(Prgm *r, bool st, char *out_file){
+  PRINT_TAC = st;
   ast_to_tac(r);
   
-  fout = fopen("a.asm", "w");
+  fout = fopen(out_file, "w");
   tac_to_mips();
   fclose(fout);
 }

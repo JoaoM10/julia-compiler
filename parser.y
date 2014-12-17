@@ -150,11 +150,29 @@ BoolExp:
 %%
 
 int main(int argc, char **argv){
+    
+  char out_file[73] = "a";
+  bool show_tac = false;
+  for(int i = 1; i < argc; i ++)
+    if(!strcmp(argv[i], "--print-tac"))
+      show_tac = true;
+    else if(i < argc - 1 && !strcmp(argv[i], "-o") && strlen(argv[i + 1]) < 20)
+      strcpy(out_file, argv[i + 1]);
+    else if(!strcmp(argv[i], "-h")){
+      printf("Usage: %s <file name> <options>\n", argv[0]);
+      printf("Options:\n");  
+      printf("\t-o <file name>\tName the generated MIPS file.\n");  
+      printf("\t--print-tac\tPrint the generated Three Address Code.\n");  
+      return 0;
+    }
 
-  if(argc != 2){
-    printf("Usage: %s <file name>\n", argv[0]);
+  if(argc < 2){
+    printf("Usage: %s <file name> <options>\n", argv[0]);
+    printf("Use -h flag to see all options.\n");
     return -1;
   }
+
+  strcat(out_file, ".asm");
   
   FILE *fin = fopen(argv[1], "r");
   if(!fin){
@@ -169,7 +187,7 @@ int main(int argc, char **argv){
   if(!root->semantic_analysis())
       exit(-1);
   
-  compile(root);
+  compile(root, show_tac, out_file);
   
   return 0;
 }
