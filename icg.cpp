@@ -289,7 +289,7 @@ void Cmd_While::gen_code(string lbl_nxt){
   c1->gen_code(top.str());
 
   if(PRINT_TAC) printf("Out Scope\n");
-  tac_code.push_back(new Tac(TC_OUT_SCOPE, new ConstAddr(top.str()), NULL, NULL));
+  tac_code.push_back(new Tac(TC_OUT_SCOPE, NULL, NULL, NULL));
   
   if(PRINT_TAC) printf("\tgoto %s\n", top.str().c_str());
   tac_code.push_back(new Tac(TC_GOTO, new ConstAddr(top.str()), NULL, NULL));
