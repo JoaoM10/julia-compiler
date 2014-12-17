@@ -16,6 +16,7 @@ public:
 class Addr {
 public:
   virtual string str() = 0;
+  virtual VAL_TYPE get_type() = 0;
 };
 class TempAddr : public Addr {
   static unsigned int cnt;
@@ -23,7 +24,10 @@ class TempAddr : public Addr {
 public:
   TempAddr () : lnum(cnt ++) { }
   string str(){
-    return ("t" + to_string(lnum));
+    return ("$t" + to_string(lnum));
+  }
+  VAL_TYPE get_type(){
+    return VT_UNK;
   }
 };
 class ValAddr : public Addr {
@@ -33,6 +37,9 @@ public:
   string str(){
     return v->str();
   }
+  VAL_TYPE get_type(){
+    return v->get_type();
+  }
 };
 class ConstAddr : public Addr {
   string s;
@@ -41,12 +48,15 @@ public:
   string str(){
     return s;
   }
+  VAL_TYPE get_type(){
+    return VT_UNK;
+  }
 };
 
 
 
 
-enum TC_OP { TC_PRINT, TC_PRINT_ENDL, TC_ADD, TC_SUB, TC_MUL, TC_DIV, TC_POW, TC_MOD, TC_MIN, TC_AND, TC_OR, TC_EQ, TC_NEQ, TC_LT, TC_GT, TC_LEQ, TC_GEQ, TC_NOT, TC_ATR, TC_LBL, TC_GOTO, TC_IFEQ, TC_IFNEQ, TC_IFLT, TC_IFGT, TC_IFLEQ, TC_IFGEQ };
+enum TC_OP { TC_PRINT, TC_PRINT_ENDL, TC_ADD, TC_SUB, TC_MUL, TC_DIV, TC_POW, TC_MOD, TC_MIN, TC_AND, TC_OR, TC_EQ, TC_NEQ, TC_LT, TC_GT, TC_LEQ, TC_GEQ, TC_NOT, TC_ATR, TC_LBL, TC_GOTO, TC_IFEQ, TC_IFNEQ, TC_IFLT, TC_IFGT, TC_IFLEQ, TC_IFGEQ, TC_LOAD };
 class Tac {
 public:
   TC_OP op;

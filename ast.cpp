@@ -23,8 +23,8 @@ string Float::str(){
   return to_string(fval);
 }
 string Bool::str(){
-  if(bval) return "true";
-  else return "false";
+  if(bval) return "1";
+  else return "0";
 }
 string Var::str(){
   return sval;
