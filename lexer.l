@@ -73,6 +73,10 @@ else                                    { return TokenElse; }
 
 while                                   { return TokenWhile; }
 
+   /* Functions */
+
+function                                { return TokenFunction; }
+
    /* Others */
 
 \,                                      { return TokenComma; }

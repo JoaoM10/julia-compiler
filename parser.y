@@ -40,7 +40,8 @@ void yyerror(const char *s);
 %token                  TokenIf TokenElseIf TokenElse
 %token                  TokenWhile
 %token                  TokenComma TokenEnd TokenSep TokenEndl
-
+%token                  TokenFunction
+                        
 %nonassoc               TokenGt TokenLt TokenLeq TokenGeq TokenEq TokenNotEq TokenBoolNot
 %left                   TokenBoolOr
 %left                   TokenBoolAnd
@@ -87,6 +88,7 @@ IfExp:
 ListExp:
                 Exp TokenComma ListExp                                        { $$ = new Lst($1, $3); }
         |       Exp                                                           { $$ = new Lst($1); }
+        |       /* epsilon */                                                 { $$ = NULL; }
                 ;
 
 Exp:
