@@ -14,7 +14,10 @@ unsigned int TempAddr::cnt = 0;
 vector <Tac*> tac_code;
 FILE *fout;
 map <string, piv> var_tac_mips;
-int var_sz = 0;
+int var_sz = 0, vars_to_rm;
+
+vector < map<string,piv> > buf_vars;
+vector <int> buf_szs, buf_szs2;
 
 Addr* Exp_Val::gen_code(){
   if(v1->get_type() == VT_VAR)
@@ -268,15 +271,35 @@ void Cmd_Print::gen_code(string lbl_nxt){
   tac_code.push_back(new Tac(TC_PRINT_ENDL, NULL, NULL, NULL));
 }
 void Cmd_While::gen_code(string lbl_nxt){
-  Label top, body;
+  Label top, body, nn;
+
   if(PRINT_TAC) printf("%s:\n", top.str().c_str());
   tac_code.push_back(new Tac(TC_LBL, new ConstAddr(top.str()), NULL, NULL));
-  x1->gen_jmp_code(body.str(), lbl_nxt);
+
+  if(PRINT_TAC) printf("In Scope\n");
+  tac_code.push_back(new Tac(TC_IN_SCOPE, NULL, NULL, NULL));
+  
+  x1->gen_jmp_code(body.str(), nn.str());
+
+  if(PRINT_TAC) printf("Fin Scope\n");
+  tac_code.push_back(new Tac(TC_FIN_SCOPE, NULL, NULL, NULL));
+  
   if(PRINT_TAC) printf("%s:\n", body.str().c_str());
   tac_code.push_back(new Tac(TC_LBL, new ConstAddr(body.str()), NULL, NULL));
   c1->gen_code(top.str());
+
+  if(PRINT_TAC) printf("Out Scope\n");
+  tac_code.push_back(new Tac(TC_OUT_SCOPE, new ConstAddr(top.str()), NULL, NULL));
+  
   if(PRINT_TAC) printf("\tgoto %s\n", top.str().c_str());
   tac_code.push_back(new Tac(TC_GOTO, new ConstAddr(top.str()), NULL, NULL));
+
+  
+  if(PRINT_TAC) printf("%s:\n", nn.str().c_str());
+  tac_code.push_back(new Tac(TC_LBL, new ConstAddr(nn.str()), NULL, NULL));
+  
+  if(PRINT_TAC) printf("Fout Scope\n");
+  tac_code.push_back(new Tac(TC_FOUT_SCOPE, NULL, NULL, NULL));
 }
 void Cmd_If::gen_code(string lbl_nxt){
   if(el == NULL){
@@ -643,7 +666,7 @@ void Tac::gen_mips(){
     fprintf(fout, "%s:\n", r1->str().c_str());
     break;
   case TC_GOTO:
-    fprintf(fout, "jal\t%s\n", r1->str().c_str());
+    fprintf(fout, "\tjal\t%s\n", r1->str().c_str());
     break;
   case TC_IFEQ:
     if(var_tac_mips[r1->str()].Y != VT_FLOAT){
@@ -723,6 +746,28 @@ void Tac::gen_mips(){
       fprintf(fout, "\tbc1f\t%s\n", r3->str().c_str());
     }
     break;
+
+  case TC_IN_SCOPE:
+    buf_vars.push_back(var_tac_mips);
+    buf_szs.push_back(var_sz);
+    break;
+  case TC_OUT_SCOPE:
+    vars_to_rm = var_sz - buf_szs.back();
+    fprintf(fout, "\taddi\t$sp, $sp, %d\n", 4*vars_to_rm);
+    var_tac_mips = buf_vars.back();
+    var_sz = buf_szs.back();
+    buf_vars.pop_back();
+    buf_szs.pop_back();
+    break;
+
+  case TC_FIN_SCOPE:
+    vars_to_rm = var_sz - buf_szs.back();
+    buf_szs2.push_back(vars_to_rm);
+    break;
+  case TC_FOUT_SCOPE:
+    fprintf(fout, "\taddi\t$sp, $sp, %d\n", 4*buf_szs2.back());
+    buf_szs2.pop_back();
+    break;  
   }
 }
 
