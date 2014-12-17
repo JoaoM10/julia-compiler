@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 #include "ast.h"
 #include "icg.h"
-#define PRINT_TAC 1 
+#define PRINT_TAC 0
 #define X first
 #define Y second
 using namespace std;
@@ -525,22 +525,91 @@ void Tac::gen_mips(){
     break;
 
   case TC_AND:
+    if(var_tac_mips.find(r1->str()) == var_tac_mips.end())
+      create_mips_var(r1->str(), var_tac_mips[r2->str()].Y);
+    fprintf(fout, "\tlw\t$t1, %d($sp)\n", calc_sp(r2->str()));
+    fprintf(fout, "\tlw\t$t2, %d($sp)\n", calc_sp(r3->str()));
+    fprintf(fout, "\tand\t$t3, $t1, $t2\n");
+    fprintf(fout, "\tla\t$t0, %d($sp)\n", calc_sp(r1->str()));    
+    fprintf(fout, "\tsw\t$t3, ($t0)\n");
     break;
   case TC_OR:
+    if(var_tac_mips.find(r1->str()) == var_tac_mips.end())
+      create_mips_var(r1->str(), var_tac_mips[r2->str()].Y);
+    fprintf(fout, "\tlw\t$t1, %d($sp)\n", calc_sp(r2->str()));
+    fprintf(fout, "\tlw\t$t2, %d($sp)\n", calc_sp(r3->str()));
+    fprintf(fout, "\tor\t$t3, $t1, $t2\n");
+    fprintf(fout, "\tla\t$t0, %d($sp)\n", calc_sp(r1->str()));    
+    fprintf(fout, "\tsw\t$t3, ($t0)\n");
     break;
   case TC_EQ:
+    if(var_tac_mips.find(r1->str()) == var_tac_mips.end())
+      create_mips_var(r1->str(), VT_BOOL);
+    fprintf(fout, "\tlw\t$t1, %d($sp)\n", calc_sp(r2->str()));
+    fprintf(fout, "\tlw\t$t2, %d($sp)\n", calc_sp(r3->str()));
+    fprintf(fout, "\tslt\t$t3, $t1, $t2\n");
+    fprintf(fout, "\tslt\t$t4, $t2, $t1\n");
+    fprintf(fout, "\tor\t$t5, $t3, $t4\n");
+    fprintf(fout, "\txori\t$t5, $t5, 1\n");
+    fprintf(fout, "\tla\t$t0, %d($sp)\n", calc_sp(r1->str()));    
+    fprintf(fout, "\tsw\t$t5, ($t0)\n");
     break;
   case TC_NEQ:
+    if(var_tac_mips.find(r1->str()) == var_tac_mips.end())
+      create_mips_var(r1->str(), VT_BOOL);
+    fprintf(fout, "\tlw\t$t1, %d($sp)\n", calc_sp(r2->str()));
+    fprintf(fout, "\tlw\t$t2, %d($sp)\n", calc_sp(r3->str()));
+    fprintf(fout, "\tslt\t$t3, $t1, $t2\n");
+    fprintf(fout, "\tslt\t$t4, $t2, $t1\n");
+    fprintf(fout, "\tor\t$t5, $t3, $t4\n");
+    fprintf(fout, "\tla\t$t0, %d($sp)\n", calc_sp(r1->str()));    
+    fprintf(fout, "\tsw\t$t5, ($t0)\n");
     break;
   case TC_LT:
+    if(var_tac_mips.find(r1->str()) == var_tac_mips.end())
+      create_mips_var(r1->str(), VT_BOOL);
+    fprintf(fout, "\tlw\t$t1, %d($sp)\n", calc_sp(r2->str()));
+    fprintf(fout, "\tlw\t$t2, %d($sp)\n", calc_sp(r3->str()));
+    fprintf(fout, "\tslt\t$t3, $t1, $t2\n");
+    fprintf(fout, "\tla\t$t0, %d($sp)\n", calc_sp(r1->str()));    
+    fprintf(fout, "\tsw\t$t3, ($t0)\n");
     break;
   case TC_GT:
+    if(var_tac_mips.find(r1->str()) == var_tac_mips.end())
+      create_mips_var(r1->str(), VT_BOOL);
+    fprintf(fout, "\tlw\t$t1, %d($sp)\n", calc_sp(r2->str()));
+    fprintf(fout, "\tlw\t$t2, %d($sp)\n", calc_sp(r3->str()));
+    fprintf(fout, "\tslt\t$t3, $t2, $t1\n");
+    fprintf(fout, "\tla\t$t0, %d($sp)\n", calc_sp(r1->str()));    
+    fprintf(fout, "\tsw\t$t3, ($t0)\n");
     break;
   case TC_LEQ:
+    if(var_tac_mips.find(r1->str()) == var_tac_mips.end())
+      create_mips_var(r1->str(), VT_BOOL);
+    fprintf(fout, "\tlw\t$t1, %d($sp)\n", calc_sp(r2->str()));
+    fprintf(fout, "\tlw\t$t2, %d($sp)\n", calc_sp(r3->str()));
+    fprintf(fout, "\tslt\t$t3, $t2, $t1\n");
+    fprintf(fout, "\txori\t$t3, $t3, 1\n");
+    fprintf(fout, "\tla\t$t0, %d($sp)\n", calc_sp(r1->str()));    
+    fprintf(fout, "\tsw\t$t3, ($t0)\n");
     break;
   case TC_GEQ:
+    if(var_tac_mips.find(r1->str()) == var_tac_mips.end())
+      create_mips_var(r1->str(), VT_BOOL);
+    fprintf(fout, "\tlw\t$t1, %d($sp)\n", calc_sp(r2->str()));
+    fprintf(fout, "\tlw\t$t2, %d($sp)\n", calc_sp(r3->str()));
+    fprintf(fout, "\tslt\t$t3, $t1, $t2\n");
+    fprintf(fout, "\txori\t$t3, $t3, 1\n");
+    fprintf(fout, "\tla\t$t0, %d($sp)\n", calc_sp(r1->str()));    
+    fprintf(fout, "\tsw\t$t3, ($t0)\n");
     break;
   case TC_NOT:
+    if(var_tac_mips.find(r1->str()) == var_tac_mips.end())
+      create_mips_var(r1->str(), var_tac_mips[r2->str()].Y);
+    fprintf(fout, "\tlw\t$t1, %d($sp)\n", calc_sp(r2->str()));
+    fprintf(fout, "\txori\t$t2, $t1, 1\n");
+    fprintf(fout, "\tla\t$t0, %d($sp)\n", calc_sp(r1->str()));    
+    fprintf(fout, "\tsw\t$t2, ($t0)\n");
     break;
     
   case TC_LOAD:
