@@ -741,6 +741,7 @@ void tac_to_mips(){
 
 void compile(Prgm *r, bool st, char *out_file){
   PRINT_TAC = st;
+
   ast_to_tac(r);
   
   fout = fopen(out_file, "w");
