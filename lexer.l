@@ -8,8 +8,27 @@ using namespace std;
 
 int line_num = 1;
 %}
+
+%s COMMENTA
+%s COMMENTB
+                                                
 %%
 
+   /* Comments */
+\#\=                                    { BEGIN(COMMENTB); }
+<COMMENTB>{
+\=\#                                    { BEGIN(INITIAL); }
+\n                                      { line_num ++; }
+.                                       ;
+}
+
+\#                                      { BEGIN(COMMENTA); }
+<COMMENTA>{
+\n                                      { BEGIN(INITIAL); line_num ++; return TokenEndl; }
+.                                       ;
+}
+
+<INITIAL>{
    /* Arithmetic operators */
 
 \+                                      { return TokenAdd; }
@@ -73,5 +92,5 @@ false                                   { yylval.bval = (yytext[0] == 't'); retu
 
 [ \t\f\r]                               ;
 .                                       { /* ERROR! */ }
-
+}
 %%
